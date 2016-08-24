@@ -39,20 +39,17 @@ public class PlatformRotation : MonoBehaviour {
 
     public void StartRotation()
     {
-        //Debug.Log(this + "-StartRotation");
         rotate = true;
     }
 
     void SetYAngle()
     {
         currentYAngle = transform.eulerAngles.y;
-        //Debug.Log(this + "-SetYAngle, currentYAngle: " + currentYAngle + ", nextYAngle: " + nextYAngle);
     }
 
     void SetNextYAngle()
     {
         nextYAngle = transform.eulerAngles.y + 90;
-        //Debug.Log(this + "-SetYAngle, nextYAngle: " + nextYAngle);
     }
 
 }

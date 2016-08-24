@@ -14,6 +14,7 @@ public class BoxInteraction : MonoBehaviour {
     GameObject gameObjectSelected;
     SearchPlatform searchPlatform;
     PlatformRotation platformRotation;
+    MovePlatform movePlatform;
 
     void Start () {}
 	
@@ -32,14 +33,24 @@ public class BoxInteraction : MonoBehaviour {
     {
         Ray cameraToStage = new Ray(gameplayCamera.ScreenToWorldPoint(Input.mousePosition), gameplayCamera.transform.forward);
         RaycastHit hit;
-        if (Physics.Raycast(cameraToStage, out hit, (float)25))
+        int layerMask = 1 << LayerMask.NameToLayer("Platforms");
+
+        if (Physics.Raycast(cameraToStage, out hit, (float)25, layerMask))
         {
             gameObjectSelected = hit.collider.gameObject;
-            searchPlatform = gameObjectSelected.GetComponent<SearchPlatform>();
-            platformRotation = gameObjectSelected.GetComponent<PlatformRotation>();
+            SetScripts();
             firstMousePosition = Input.mousePosition;
             SetFirstClick(true);
         }
+    }
+
+    void SetScripts()
+    {
+        searchPlatform = gameObjectSelected.GetComponent<SearchPlatform>();
+        platformRotation = gameObjectSelected.GetComponent<PlatformRotation>();
+        movePlatform = gameObjectSelected.GetComponent<MovePlatform>();
+        movePlatform.SetLastPosition(gameObjectSelected.transform.position);
+        movePlatform.SetCamera(gameplayCamera);
     }
 
     void OnMouseButtonUp()
@@ -52,9 +63,26 @@ public class BoxInteraction : MonoBehaviour {
             if (platformRotation != null && distance < minDistanceToMove)
                 platformRotation.StartRotation();
 
+            if (movePlatform != null && movePlatform.GetDrag())
+            { 
+                movePlatform.StopDrag();
+                if (searchPlatform != null && searchPlatform.GetFind())
+                {
+                    searchPlatform.SetFind(false);
+                    movePlatform.SetNextPosition(searchPlatform.GetNextPosition());
+                    GameObject otherPlatform = searchPlatform.GetOtherPlatform();
+                    otherPlatform.GetComponent<MovePlatform>().SetNextPosition(movePlatform.GetLastPosition());
+                }
+                else
+                {
+                    movePlatform.StartBack();
+                }
+            }
+
             gameObjectSelected = null;
             platformRotation = null;
             searchPlatform = null;
+            movePlatform = null;
         }
         SetFirstClick(false);
     }
@@ -71,7 +99,10 @@ public class BoxInteraction : MonoBehaviour {
 
     void MoveGameObject()
     {
-        if(searchPlatform != null && !searchPlatform.GetSearching())
+        if (movePlatform != null && !movePlatform.GetDrag())
+            movePlatform.StartDrag();
+
+        if (searchPlatform != null && !searchPlatform.GetSearching())
             searchPlatform.StartSearch();
     }
 

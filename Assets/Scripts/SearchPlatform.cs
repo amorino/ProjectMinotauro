@@ -4,6 +4,9 @@ using System.Collections;
 public class SearchPlatform : MonoBehaviour {
 
     bool searching = false;
+    bool find = false;
+    Vector3 nextPosition;
+    GameObject otherPlatform;
 
 	void Start () { }
 	
@@ -15,12 +18,16 @@ public class SearchPlatform : MonoBehaviour {
 
     void Search()
     {
-        Debug.Log(this + "-Search");
         RaycastHit hit;
         Ray platformToVectorDown = new Ray(gameObject.transform.position, Vector3.down);
-        if (Physics.Raycast(platformToVectorDown, out hit, (float)2))
+        int layerMask = 1 << LayerMask.NameToLayer("Platforms");
+        if (Physics.Raycast(platformToVectorDown, out hit, (float)2, layerMask))
         {
             Debug.Log(this + "-Search, gameObject.name: " + hit.collider.gameObject.name);
+            otherPlatform = hit.collider.gameObject;
+            find = true;
+            nextPosition = hit.collider.gameObject.transform.position;
+            Debug.Log(this + "-Search, nextPosition: " + nextPosition);
         }
     }
 
@@ -37,5 +44,25 @@ public class SearchPlatform : MonoBehaviour {
     public bool GetSearching()
     {
         return searching;
+    }
+
+    public bool GetFind()
+    {
+        return find;
+    }
+
+    public void SetFind(bool value)
+    {
+        find = value;
+    }
+
+    public Vector3 GetNextPosition()
+    {
+        return nextPosition;
+    }
+
+    public GameObject GetOtherPlatform()
+    {
+        return otherPlatform;
     }
 }
