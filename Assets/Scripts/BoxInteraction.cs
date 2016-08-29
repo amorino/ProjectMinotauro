@@ -23,7 +23,7 @@ public class BoxInteraction : MonoBehaviour {
             OnMouseButtonDown();
 
         if (Input.GetMouseButtonUp(0))
-            OnMouseButtonUp();
+            OnMouseButtonUp();  
 
         if (Input.GetMouseButton(0))
             OnMouseButtonHeldDown();
@@ -55,7 +55,7 @@ public class BoxInteraction : MonoBehaviour {
 
     void OnMouseButtonUp()
     {
-        if (GetFirstClick())
+        if (GetFirstClick() && !movePlatform.GetMove() && !platformRotation.GetRotate())
         {
             if (searchPlatform != null && searchPlatform.GetSearching())
                 searchPlatform.StopSearch();
@@ -67,29 +67,47 @@ public class BoxInteraction : MonoBehaviour {
             { 
                 movePlatform.StopDrag();
                 if (searchPlatform != null && searchPlatform.GetFind())
-                {
-                    searchPlatform.SetFind(false);
-                    movePlatform.SetNextPosition(searchPlatform.GetNextPosition());
-                    GameObject otherPlatform = searchPlatform.GetOtherPlatform();
-                    otherPlatform.GetComponent<MovePlatform>().SetNextPosition(movePlatform.GetLastPosition());
-                }
+                    ChagingPositions();
                 else
-                {
-                    movePlatform.StartBack();
-                }
+                    BackToLastPosition();
             }
-
-            gameObjectSelected = null;
-            platformRotation = null;
-            searchPlatform = null;
-            movePlatform = null;
+            ClearScripts();
         }
         SetFirstClick(false);
     }
 
+    void BackToLastPosition()
+    {
+        searchPlatform.SetFind(false);
+        movePlatform.SetNextPosition(movePlatform.GetLastPosition());
+        movePlatform.CalculateLinearTrajectory(gameObjectSelected.transform.position);
+        movePlatform.StartMove();
+    }
+
+    void ChagingPositions()
+    {
+        searchPlatform.SetFind(false);
+        movePlatform.SetNextPosition(searchPlatform.GetNextPosition());
+        movePlatform.CalculateLinearTrajectory(gameObjectSelected.transform.position);
+        movePlatform.StartMove();
+
+        GameObject otherPlatform = searchPlatform.GetOtherPlatform();
+        otherPlatform.GetComponent<MovePlatform>().SetNextPosition(movePlatform.GetLastPosition());
+        otherPlatform.GetComponent<MovePlatform>().CalculateCuadraticTrajectory(otherPlatform.transform.position);
+        otherPlatform.GetComponent<MovePlatform>().StartMove();
+    }
+
+    void ClearScripts()
+    {
+        gameObjectSelected = null;
+        platformRotation = null;
+        searchPlatform = null;
+        movePlatform = null;
+    }
+
     void OnMouseButtonHeldDown()
     {
-        if(GetFirstClick())
+        if(GetFirstClick() && !movePlatform.GetMove() && !platformRotation.GetRotate())
         {
             distance = Vector3.Distance(firstMousePosition, Input.mousePosition);
             if(distance > minDistanceToMove)

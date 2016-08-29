@@ -19,16 +19,16 @@ public class SearchPlatform : MonoBehaviour {
     void Search()
     {
         RaycastHit hit;
-        Ray platformToVectorDown = new Ray(gameObject.transform.position, Vector3.down);
+        Ray platformToVectorDown = new Ray(gameObject.transform.position + Vector3.up / 2, Vector3.down);
+        gameObject.layer += 1;
         int layerMask = 1 << LayerMask.NameToLayer("Platforms");
         if (Physics.Raycast(platformToVectorDown, out hit, (float)2, layerMask))
         {
-            Debug.Log(this + "-Search, gameObject.name: " + hit.collider.gameObject.name);
             otherPlatform = hit.collider.gameObject;
             find = true;
             nextPosition = hit.collider.gameObject.transform.position;
-            Debug.Log(this + "-Search, nextPosition: " + nextPosition);
         }
+        gameObject.layer -= 1;
     }
 
     public void StartSearch ()

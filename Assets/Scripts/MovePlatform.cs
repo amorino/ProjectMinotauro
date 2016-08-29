@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MovePlatform : MonoBehaviour {
 
     bool drag = false;
-    bool back = false;
-    bool next = false;
+    bool move = false;
+    int index = 0;
+    int divider = 20;
 
+    Vector3 upInc = Vector3.up * 0.25f;
     Camera gameplayCamera;
     Vector3 lastPosition;
     Vector3 nextPosition;
+    List<Vector3> trajectory;
 
     void Start () {}
 
@@ -18,18 +22,22 @@ public class MovePlatform : MonoBehaviour {
         if (drag)
             DragPlatform();
 
-        if (back)
-            BackPlatform();
-
-        if (next)
+        if (move)
             MoveToNextPosition();
-
     }
 
     void MoveToNextPosition()
     {
-        Debug.Log(this + "- MoveToNextPosition");
-        next = false;
+        //Debug.Log(this + "- MoveToNextPosition");
+        if (index < trajectory.Count)
+        {
+            transform.position = trajectory[index];
+            index++;
+        }
+        else
+        {
+            move = false;
+        }
     }
 
     void DragPlatform()
@@ -42,10 +50,37 @@ public class MovePlatform : MonoBehaviour {
             transform.position = hit.point;
     }
 
-    void BackPlatform()
+    public void CalculateLinearTrajectory(Vector3 currentPosition)
     {
-        Debug.Log(this + "- Back Platform");
-        back = false;
+        index = 0;
+        trajectory = new List<Vector3>();
+        Vector3 direction = nextPosition - currentPosition;
+        Vector3 directionFraction = direction / (float)divider;
+
+        for (int i = 0; i < divider; i++)
+            if (i < divider - 1)
+                trajectory.Add(currentPosition + direction * ((float)i / (float)divider));
+            else
+                trajectory.Add(nextPosition);
+
+        //Debug.DrawLine(currentPosition + upInc, currentPosition + direction + upInc, Color.red, 10);
+        //Debug.LogError(this + "Pause");
+    }
+
+    public void CalculateCuadraticTrajectory(Vector3 currentPosition)
+    {
+        index = 0;
+        trajectory = new List<Vector3>();
+        Vector3 direction = nextPosition - currentPosition;
+
+        for (int i = 0; i < divider; i++)
+            if (i < divider - 1)
+                trajectory.Add(currentPosition + direction * ((float)i / (float)divider));
+            else
+                trajectory.Add(nextPosition);
+
+        //Debug.DrawLine(currentPosition + upInc, currentPosition + direction + upInc, Color.blue, 10);
+        //Debug.LogError(this + "Pause");
     }
 
     public void StartDrag()
@@ -69,28 +104,28 @@ public class MovePlatform : MonoBehaviour {
             gameplayCamera = camera;
     }
 
-    public void StartBack()
-    {
-        back = true;
-    }
-
     public void SetNextPosition(Vector3 position)
     {
         nextPosition = position;
-        next = true;
-        //Debug.Log(this + "-SetNextPosition, nextPosition: " + nextPosition);
     }
 
     public void SetLastPosition(Vector3 position)
     {
         lastPosition = position;
-        //Debug.Log(this + "-SetLastPosition, lastPosition: " + lastPosition);
     }
 
     public Vector3 GetLastPosition()
     {
-        //Debug.Log(this + "-GetLastPosition, lastPosition: " + lastPosition);
         return lastPosition;
     }
 
+    public void StartMove()
+    {
+        move = true;
+    }
+
+    public bool GetMove()
+    {
+        return move;
+    }
 }

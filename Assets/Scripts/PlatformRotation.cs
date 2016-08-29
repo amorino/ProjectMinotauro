@@ -52,4 +52,9 @@ public class PlatformRotation : MonoBehaviour {
         nextYAngle = transform.eulerAngles.y + 90;
     }
 
+    public bool GetRotate()
+    {
+        return rotate;
+    }
+
 }
