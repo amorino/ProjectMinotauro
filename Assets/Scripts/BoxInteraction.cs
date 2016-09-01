@@ -79,22 +79,24 @@ public class BoxInteraction : MonoBehaviour {
     void BackToLastPosition()
     {
         searchPlatform.SetFind(false);
-        movePlatform.SetNextPosition(movePlatform.GetLastPosition());
-        movePlatform.CalculateLinearTrajectory(gameObjectSelected.transform.position);
-        movePlatform.StartMove();
+        MovePlatformToPosition(movePlatform, movePlatform.GetLastPosition(), gameObjectSelected.transform.position);
     }
 
     void ChagingPositions()
     {
         searchPlatform.SetFind(false);
-        movePlatform.SetNextPosition(searchPlatform.GetNextPosition());
-        movePlatform.CalculateLinearTrajectory(gameObjectSelected.transform.position);
-        movePlatform.StartMove();
+        MovePlatformToPosition(movePlatform, searchPlatform.GetNextPosition(), gameObjectSelected.transform.position);
 
         GameObject otherPlatform = searchPlatform.GetOtherPlatform();
-        otherPlatform.GetComponent<MovePlatform>().SetNextPosition(movePlatform.GetLastPosition());
-        otherPlatform.GetComponent<MovePlatform>().CalculateCuadraticTrajectory(otherPlatform.transform.position);
-        otherPlatform.GetComponent<MovePlatform>().StartMove();
+        MovePlatform otherMovePlatform = otherPlatform.GetComponent<MovePlatform>();
+        MovePlatformToPosition(otherMovePlatform, movePlatform.GetLastPosition(), otherPlatform.transform.position);
+    }
+
+    void MovePlatformToPosition(MovePlatform moveTemp, Vector3 nextPosition, Vector3 currentPosition)
+    {
+        moveTemp.SetNextPosition(nextPosition);
+        moveTemp.CalculateLinearTrajectory(currentPosition);
+        moveTemp.StartMove();
     }
 
     void ClearScripts()
