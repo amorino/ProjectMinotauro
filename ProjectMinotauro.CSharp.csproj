@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BoxInteraction.cs" />
+    <Compile Include="Assets\Scripts\IndicatorPositions.cs" />
     <Compile Include="Assets\Scripts\MovePlatform.cs" />
     <Compile Include="Assets\Scripts\PlatformRotation.cs" />
     <Compile Include="Assets\Scripts\SearchPlatform.cs" />
