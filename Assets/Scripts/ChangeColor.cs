@@ -11,7 +11,7 @@ public class ChangeColor : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		cube = transform.Find("Cube").gameObject;
+		cube = transform.Find("Platform").gameObject;
 		rend = cube.GetComponent<Renderer>();
 		rend.enabled = true;
 		originalMaterial = rend.sharedMaterial;
@@ -28,11 +28,11 @@ public class ChangeColor : MonoBehaviour {
 		}
 	}
 
-	public void setDrag(){
+	public void IsDragging(){
 		drag = true;
 	}
 
-	public void StopDrag()
+	public void StopDragging()
 	{
 		drag = false;
 	}

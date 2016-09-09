@@ -15,6 +15,7 @@ public class BoxInteraction : MonoBehaviour {
     SearchPlatform searchPlatform;
     PlatformRotation platformRotation;
     MovePlatform movePlatform;
+	ChangeColor changeColor;
 
     void Start () {}
 	
@@ -49,6 +50,7 @@ public class BoxInteraction : MonoBehaviour {
         searchPlatform = gameObjectSelected.GetComponent<SearchPlatform>();
         platformRotation = gameObjectSelected.GetComponent<PlatformRotation>();
         movePlatform = gameObjectSelected.GetComponent<MovePlatform>();
+		changeColor = gameObjectSelected.GetComponent<ChangeColor>();
         movePlatform.SetLastPosition(gameObjectSelected.transform.position);
         movePlatform.SetCamera(gameplayCamera);
     }
@@ -66,6 +68,7 @@ public class BoxInteraction : MonoBehaviour {
             if (movePlatform != null && movePlatform.GetDrag())
             { 
                 movePlatform.StopDrag();
+				changeColor.StopDragging ();
                 if (searchPlatform != null && searchPlatform.GetFind())
                     ChagingPositions();
                 else
@@ -119,8 +122,11 @@ public class BoxInteraction : MonoBehaviour {
 
     void MoveGameObject()
     {
-        if (movePlatform != null && !movePlatform.GetDrag())
-            movePlatform.StartDrag();
+		if (movePlatform != null && !movePlatform.GetDrag ()) {
+			movePlatform.StartDrag();
+			changeColor.IsDragging ();
+		}
+          
 
         if (searchPlatform != null && !searchPlatform.GetSearching())
             searchPlatform.StartSearch();
